@@ -158,18 +158,18 @@ export default function EditEventPage() {
         {/* Header */}
         <div className="flex items-center gap-4">
           <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 rounded-lg"><ArrowLeft className="w-6 h-6" /></button>
-          <div><h1 className="text-3xl font-bold">Edit Event</h1><p className="text-gray-600 mt-1">Update detail untuk event {formData.nama_tender}.</p></div>
+          <div><h1 className="text-3xl font-bold">Edit Event</h1><p className="text-black-600 mt-1">Update detail untuk event {formData.nama_tender}.</p></div>
         </div>
 
         {/* Main Details Card */}
         <Card>
           <form onSubmit={handleSubmit} className="space-y-6 p-6">
-            <h3 className="text-lg font-medium border-b pb-2">Detail Utama</h3>
+            <h3 className="text-lg font-medium text-gray-900 border-b pb-2">Detail Utama</h3>
             {error && <div className="p-4 my-4 text-sm text-red-800 rounded-lg bg-red-50">{error}</div>}
-            <div className="space-y-2"><label htmlFor="nama_tender">Nama Tender</label><Input id="nama_tender" name="nama_tender" value={formData.nama_tender || ''} onChange={handleChange} required /></div>
-            <div className="space-y-2"><label htmlFor="deskripsi">Deskripsi</label><textarea id="deskripsi" name="deskripsi" value={formData.deskripsi || ''} onChange={handleChange} rows={4} className="w-full p-2 border rounded-md"></textarea></div>
-            <div className="grid md:grid-cols-2 gap-6"><div className="space-y-2"><label htmlFor="lokasi">Lokasi</label><Input id="lokasi" name="lokasi" value={formData.lokasi || ''} onChange={handleChange} required /></div><div className="space-y-2"><label htmlFor="budget">Budget</label><Input id="budget" name="budget" type="number" value={formData.budget || ''} onChange={handleChange} required /></div></div>
-            <div className="grid md:grid-cols-2 gap-6"><div className="space-y-2"><label htmlFor="tanggal_mulai">Tanggal Mulai</label><Input id="tanggal_mulai" name="tanggal_mulai" type="date" value={formData.tanggal_mulai || ''} onChange={handleChange} required /></div><div className="space-y-2"><label htmlFor="tanggal_selesai">Tanggal Selesai</label><Input id="tanggal_selesai" name="tanggal_selesai" type="date" value={formData.tanggal_selesai || ''} onChange={handleChange} required /></div></div>
+            <div className="space-y-2"><label htmlFor="nama_tender" className="text-gray-700 font-medium">Nama Tender</label><Input id="nama_tender" name="nama_tender" value={formData.nama_tender || ''} onChange={handleChange} required /></div>
+            <div className="space-y-2"><label htmlFor="deskripsi" className="text-gray-700 font-medium">Deskripsi</label><textarea id="deskripsi" name="deskripsi" value={formData.deskripsi || ''} onChange={handleChange} rows={4} className="w-full p-2 border rounded-md text-gray-900"></textarea></div>
+            <div className="grid md:grid-cols-2 gap-6"><div className="space-y-2"><label htmlFor="lokasi" className="text-gray-700 font-medium">Lokasi</label><Input id="lokasi" name="lokasi" value={formData.lokasi || ''} onChange={handleChange} required /></div><div className="space-y-2"><label htmlFor="budget" className="text-gray-700 font-medium">Budget</label><Input id="budget" name="budget" type="number" value={formData.budget || ''} onChange={handleChange} required /></div></div>
+            <div className="grid md:grid-cols-2 gap-6"><div className="space-y-2"><label htmlFor="tanggal_mulai" className="text-gray-700 font-medium">Tanggal Mulai</label><Input id="tanggal_mulai" name="tanggal_mulai" type="date" value={formData.tanggal_mulai || ''} onChange={handleChange} required /></div><div className="space-y-2"><label htmlFor="tanggal_selesai" className="text-gray-700 font-medium">Tanggal Selesai</label><Input id="tanggal_selesai" name="tanggal_selesai" type="date" value={formData.tanggal_selesai || ''} onChange={handleChange} required /></div></div>
             <div className="flex justify-end gap-4"><Button type="button" variant="outline" onClick={() => router.push(`/dashboard/events/${eventId}`)}>Batal</Button><Button type="submit" disabled={isLoading}>{isLoading ? 'Menyimpan...' : 'Simpan Perubahan'}</Button></div>
           </form>
         </Card>
@@ -177,19 +177,19 @@ export default function EditEventPage() {
         {/* Status Change Card */}
         <Card>
           <div className="p-6">
-            <h3 className="text-lg font-medium border-b pb-2">Ubah Status</h3>
+            <h3 className="text-lg font-medium text-gray-900 border-b pb-2">Ubah Status</h3>
             {statusError && <div className="p-4 my-4 text-sm text-red-800 rounded-lg bg-red-50">{statusError}</div>}
-            <div className="mt-4 flex items-center gap-4"><select value={newStatus} onChange={(e) => setNewStatus(e.target.value as Event['status'])} className="flex-grow p-2 border rounded-md bg-white"><option value="planning">Planning</option><option value="on_progress">On Progress</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select><Button onClick={handleStatusChange} disabled={statusLoading}>{statusLoading ? 'Menyimpan...' : 'Simpan Status'}</Button></div>
+            <div className="mt-4 flex items-center gap-4"><select value={newStatus} onChange={(e) => setNewStatus(e.target.value as Event['status'])} className="flex-grow p-2 border rounded-md bg-white text-gray-900"><option value="planning">Planning</option><option value="on_progress">On Progress</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select><Button onClick={handleStatusChange} disabled={statusLoading}>{statusLoading ? 'Menyimpan...' : 'Simpan Status'}</Button></div>
           </div>
         </Card>
 
         {/* Petugas Management Card */}
         <Card>
           <div className="p-6">
-            <h3 className="text-lg font-medium border-b pb-2">Kelola Petugas</h3>
+            <h3 className="text-lg font-medium text-gray-900 border-b pb-2">Kelola Petugas</h3>
             {petugasError && <div className="p-4 my-4 text-sm text-red-800 rounded-lg bg-red-50">{petugasError}</div>}
-            <div className="mt-4"><label htmlFor="petugas-select" className="font-medium">Tambahkan Petugas</label><select multiple id="petugas-select" value={selectedPetugasIds} onChange={handlePetugasSelectionChange} className="w-full p-2 mt-2 border rounded-md bg-white h-40">{allUsers.map(user => (<option key={user.id} value={user.id}>{user.nama_lengkap} ({user.email})</option>))}</select><Button onClick={handleAssignPetugas} disabled={petugasLoading} className="mt-4">{petugasLoading ? 'Menyimpan...' : 'Simpan Petugas Terpilih'}</Button></div>
-            <div className="mt-6"><h4 className="font-medium">Petugas yang Ditugaskan</h4><div className="mt-2 space-y-2">{assignedPetugas.length > 0 ? assignedPetugas.map(assignment => (<div key={assignment.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"><div><p className="font-medium">{assignment.petugas.nama_lengkap}</p><p className="text-sm text-gray-500">{assignment.petugas.email}</p></div><Button size="sm" variant="destructive" onClick={() => openRemoveModal(assignment)}><X className="w-4 h-4" /></Button></div>)) : (<p className="text-gray-500">Belum ada petugas yang ditugaskan.</p>)}</div></div>
+            <div className="mt-4"><label htmlFor="petugas-select" className="font-medium text-gray-700">Tambahkan Petugas</label><select multiple id="petugas-select" value={selectedPetugasIds} onChange={handlePetugasSelectionChange} className="w-full p-2 mt-2 border rounded-md bg-white text-gray-900 h-40">{allUsers.map(user => (<option key={user.id} value={user.id}>{user.nama_lengkap} ({user.email})</option>))}</select><Button onClick={handleAssignPetugas} disabled={petugasLoading} className="mt-4">{petugasLoading ? 'Menyimpan...' : 'Simpan Petugas Terpilih'}</Button></div>
+            <div className="mt-6"><h4 className="font-medium text-gray-900">Petugas yang Ditugaskan</h4><div className="mt-2 space-y-2">{assignedPetugas.length > 0 ? assignedPetugas.map(assignment => (<div key={assignment.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"><div><p className="font-medium text-gray-900">{assignment.petugas.nama_lengkap}</p><p className="text-sm text-gray-500">{assignment.petugas.email}</p></div><Button size="sm" variant="destructive" onClick={() => openRemoveModal(assignment)}><X className="w-4 h-4" /></Button></div>)) : (<p className="text-gray-500">Belum ada petugas yang ditugaskan.</p>)}</div></div>
           </div>
         </Card>
 
@@ -199,7 +199,7 @@ export default function EditEventPage() {
                 <h3 className="text-lg font-medium text-red-600">Zona Berbahaya</h3>
                 <div className="mt-4 flex items-center justify-between">
                     <div>
-                        <p className="font-medium">Hapus Event Ini</p>
+                        <p className="font-medium text-gray-900">Hapus Event Ini</p>
                         <p className="text-sm text-gray-500">Setelah dihapus, event ini tidak dapat dipulihkan.</p>
                     </div>
                     <Button variant="destructive" onClick={() => setIsDeleteEventModalOpen(true)}>Hapus Event</Button>

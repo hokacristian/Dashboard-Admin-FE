@@ -35,7 +35,7 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex min-h-screen items-center justify-center p-4">
-        <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onClick={onClose} />
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onClick={onClose} />
         <div className={`relative bg-white rounded-lg shadow-xl ${sizes[size]} w-full`}>
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
             <h3 className="text-xl font-semibold text-gray-900">{title}</h3>
