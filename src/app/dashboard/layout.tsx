@@ -20,6 +20,16 @@ export default function DashboardLayout({
     }
   }, [user, isLoading, router]);
 
+  useEffect(() => {
+    // Redirect based on user role when accessing /dashboard root
+    if (!isLoading && user) {
+      const currentPath = window.location.pathname;
+      if (currentPath === '/dashboard' && user.role === 'petugas') {
+        router.push('/dashboard/petugas');
+      }
+    }
+  }, [user, isLoading, router]);
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">

@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//mnt/d/KERJAAN/Dashboard-Monitor-FE/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

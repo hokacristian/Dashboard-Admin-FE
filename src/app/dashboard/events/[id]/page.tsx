@@ -12,6 +12,8 @@ import {
   Plus,
   CheckCircle,
   Clock,
+  Trash2,
+  Eye,
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -31,6 +33,20 @@ export default function EventDetailPage() {
   const [assignedPetugas, setAssignedPetugas] = useState<User[]>([]);
   const [recentProgress, setRecentProgress] = useState<ProgressReport[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Add Milestone Modal states
+  const [isAddMilestoneModalOpen, setIsAddMilestoneModalOpen] = useState(false);
+  const [isEditMilestoneModalOpen, setIsEditMilestoneModalOpen] = useState(false);
+  const [selectedMilestone, setSelectedMilestone] = useState<Milestone | null>(null);
+  const [milestoneFormData, setMilestoneFormData] = useState({
+    nama_milestone: '',
+    deskripsi: '',
+    deadline: '',
+    urutan: 1,
+    status: 'pending' as 'pending' | 'on_progress' | 'completed'
+  });
+  const [milestoneLoading, setMilestoneLoading] = useState(false);
+  const [milestoneError, setMilestoneError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchEventDetails();
@@ -62,6 +78,92 @@ export default function EventDetailPage() {
       style: 'currency',
       currency: 'IDR',
     }).format(amount);
+  };
+
+  const handleMilestoneChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setMilestoneFormData(prev => ({
+      ...prev,
+      [name]: name === 'urutan' ? parseInt(value) : value
+    }));
+  };
+
+  const handleAddMilestone = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMilestoneLoading(true);
+    setMilestoneError(null);
+    try {
+      await api.post(`/events/${eventId}/milestones`, milestoneFormData);
+      // Reset form
+      setMilestoneFormData({
+        nama_milestone: '',
+        deskripsi: '',
+        deadline: '',
+        urutan: milestones.length + 1,
+        status: 'pending'
+      });
+      setIsAddMilestoneModalOpen(false);
+      // Refresh milestones
+      fetchEventDetails();
+    } catch (err: any) {
+      setMilestoneError(err.response?.data?.message || 'Failed to add milestone.');
+    } finally {
+      setMilestoneLoading(false);
+    }
+  };
+
+  const openAddMilestoneModal = () => {
+    setMilestoneFormData({
+      nama_milestone: '',
+      deskripsi: '',
+      deadline: '',
+      urutan: milestones.length + 1,
+      status: 'pending'
+    });
+    setMilestoneError(null);
+    setIsAddMilestoneModalOpen(true);
+  };
+
+
+  const openEditMilestoneModal = (milestone: Milestone) => {
+    setSelectedMilestone(milestone);
+    setMilestoneFormData({
+      nama_milestone: milestone.nama_milestone,
+      deskripsi: milestone.deskripsi || '',
+      deadline: format(new Date(milestone.deadline), 'yyyy-MM-dd'),
+      urutan: milestone.urutan || 1,
+      status: milestone.status
+    });
+    setMilestoneError(null);
+    setIsEditMilestoneModalOpen(true);
+  };
+
+  const handleUpdateMilestone = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedMilestone) return;
+
+    setMilestoneLoading(true);
+    setMilestoneError(null);
+    try {
+      await api.put(`/milestones/${selectedMilestone.id}`, milestoneFormData);
+      setIsEditMilestoneModalOpen(false);
+      fetchEventDetails();
+    } catch (err: any) {
+      setMilestoneError(err.response?.data?.message || 'Failed to update milestone.');
+    } finally {
+      setMilestoneLoading(false);
+    }
+  };
+
+  const handleDeleteMilestone = async (milestoneId: string) => {
+    if (!confirm('Are you sure you want to delete this milestone?')) return;
+
+    try {
+      await api.delete(`/milestones/${milestoneId}`);
+      fetchEventDetails();
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to delete milestone.');
+    }
   };
 
   if (isLoading) {
@@ -206,7 +308,7 @@ export default function EventDetailPage() {
       <Card
         title="Milestones"
         action={
-          <Button size="sm" className="flex items-center gap-2">
+          <Button size="sm" className="flex items-center gap-2" onClick={openAddMilestoneModal}>
             <Plus className="w-4 h-4" />
             Add Milestone
           </Button>
@@ -232,6 +334,29 @@ export default function EventDetailPage() {
                     </span>
                     <StatusBadge status={milestone.status} />
                   </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => router.push(`/dashboard/milestones/${milestone.id}`)}
+                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    title="View Details"
+                  >
+                    <Eye className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => openEditMilestoneModal(milestone)}
+                    className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                    title="Edit Milestone"
+                  >
+                    <Edit className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteMilestone(milestone.id)}
+                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    title="Delete Milestone"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
             ))
@@ -277,6 +402,226 @@ export default function EventDetailPage() {
           )}
         </div>
       </Card>
+
+      {/* Add Milestone Modal */}
+      <Modal
+        isOpen={isAddMilestoneModalOpen}
+        onClose={() => setIsAddMilestoneModalOpen(false)}
+        title="Add New Milestone"
+      >
+        <form onSubmit={handleAddMilestone} className="space-y-4">
+          {milestoneError && (
+            <div className="p-4 text-sm text-red-800 rounded-lg bg-red-50">
+              {milestoneError}
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <label htmlFor="nama_milestone" className="text-gray-700 font-medium">
+              Nama Milestone
+            </label>
+            <input
+              id="nama_milestone"
+              name="nama_milestone"
+              type="text"
+              value={milestoneFormData.nama_milestone}
+              onChange={handleMilestoneChange}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="deskripsi" className="text-gray-700 font-medium">
+              Deskripsi
+            </label>
+            <textarea
+              id="deskripsi"
+              name="deskripsi"
+              value={milestoneFormData.deskripsi}
+              onChange={handleMilestoneChange}
+              rows={3}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label htmlFor="deadline" className="text-gray-700 font-medium">
+                Deadline
+              </label>
+              <input
+                id="deadline"
+                name="deadline"
+                type="date"
+                value={milestoneFormData.deadline}
+                onChange={handleMilestoneChange}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="urutan" className="text-gray-700 font-medium">
+                Urutan
+              </label>
+              <input
+                id="urutan"
+                name="urutan"
+                type="number"
+                min="1"
+                value={milestoneFormData.urutan}
+                onChange={handleMilestoneChange}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="status" className="text-gray-700 font-medium">
+              Status
+            </label>
+            <select
+              id="status"
+              name="status"
+              value={milestoneFormData.status}
+              onChange={handleMilestoneChange}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+            >
+              <option value="pending">Pending</option>
+              <option value="on_progress">On Progress</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+
+          <div className="flex justify-end gap-4 pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsAddMilestoneModalOpen(false)}
+              disabled={milestoneLoading}
+            >
+              Batal
+            </Button>
+            <Button type="submit" disabled={milestoneLoading}>
+              {milestoneLoading ? 'Menyimpan...' : 'Tambah Milestone'}
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Edit Milestone Modal */}
+      <Modal
+        isOpen={isEditMilestoneModalOpen}
+        onClose={() => setIsEditMilestoneModalOpen(false)}
+        title="Edit Milestone"
+      >
+        <form onSubmit={handleUpdateMilestone} className="space-y-4">
+          {milestoneError && (
+            <div className="p-4 text-sm text-red-800 rounded-lg bg-red-50">
+              {milestoneError}
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <label htmlFor="edit_nama_milestone" className="text-gray-700 font-medium">
+              Nama Milestone
+            </label>
+            <input
+              id="edit_nama_milestone"
+              name="nama_milestone"
+              type="text"
+              value={milestoneFormData.nama_milestone}
+              onChange={handleMilestoneChange}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="edit_deskripsi" className="text-gray-700 font-medium">
+              Deskripsi
+            </label>
+            <textarea
+              id="edit_deskripsi"
+              name="deskripsi"
+              value={milestoneFormData.deskripsi}
+              onChange={handleMilestoneChange}
+              rows={3}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label htmlFor="edit_deadline" className="text-gray-700 font-medium">
+                Deadline
+              </label>
+              <input
+                id="edit_deadline"
+                name="deadline"
+                type="date"
+                value={milestoneFormData.deadline}
+                onChange={handleMilestoneChange}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="edit_urutan" className="text-gray-700 font-medium">
+                Urutan
+              </label>
+              <input
+                id="edit_urutan"
+                name="urutan"
+                type="number"
+                min="1"
+                value={milestoneFormData.urutan}
+                onChange={handleMilestoneChange}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="edit_status" className="text-gray-700 font-medium">
+              Status
+            </label>
+            <select
+              id="edit_status"
+              name="status"
+              value={milestoneFormData.status}
+              onChange={handleMilestoneChange}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+            >
+              <option value="pending">Pending</option>
+              <option value="on_progress">On Progress</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+
+          <div className="flex justify-end gap-4 pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsEditMilestoneModalOpen(false)}
+              disabled={milestoneLoading}
+            >
+              Batal
+            </Button>
+            <Button type="submit" disabled={milestoneLoading}>
+              {milestoneLoading ? 'Menyimpan...' : 'Update Milestone'}
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
     </div>
   );
 }

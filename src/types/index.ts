@@ -20,8 +20,33 @@ export interface Event {
   tanggal_selesai: string;
   status: 'planning' | 'on_progress' | 'completed' | 'cancelled';
   progress_percentage?: number;
+  created_by?: string;
+  is_active?: boolean;
   created_at: string;
   updated_at: string;
+  creator?: {
+    id: string;
+    username: string;
+    nama_lengkap: string;
+  };
+  assigned_petugas?: {
+    id: string;
+    event_id: string;
+    petugas_id: string;
+    assigned_by: string;
+    assigned_at: string;
+    petugas: {
+      id: string;
+      username: string;
+      nama_lengkap: string;
+      foto_profil: string | null;
+    };
+  }[];
+  milestones?: Milestone[];
+  _count?: {
+    progress_reports: number;
+    milestones?: number;
+  };
 }
 
 export interface Milestone {
@@ -32,8 +57,18 @@ export interface Milestone {
   deadline: string;
   urutan: number;
   status: 'pending' | 'on_progress' | 'completed';
+  is_active?: boolean;
   created_at: string;
   updated_at: string;
+  event?: {
+    id: string;
+    nama_tender: string;
+    lokasi: string;
+  };
+  progress_reports?: any[];
+  _count?: {
+    progress_reports: number;
+  };
 }
 
 export interface ProgressReport {
@@ -41,15 +76,21 @@ export interface ProgressReport {
   event_id?: string;
   milestone_id?: string;
   petugas_id?: string;
-  description: string;
+  description?: string;
+  deskripsi?: string;
   tanggal_laporan?: string;
   persentase_progress: number;
   foto_progress?: string[];
+  foto_urls?: string[];
+  is_active?: boolean;
   created_at: string;
   updated_at?: string;
   user?: User;
   petugas?: User;
-  milestone?: Milestone;
+  milestone?: {
+    id: string;
+    nama_milestone: string;
+  };
   type?: string;
   title?: string;
   event?: Partial<Event>;

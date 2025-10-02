@@ -43,7 +43,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem('user', JSON.stringify(user));
       setUser(user);
 
-      router.push('/dashboard');
+      // Redirect based on user role
+      if (user.role === 'petugas') {
+        router.push('/dashboard/petugas');
+      } else if (user.role === 'admin' || user.role === 'supervisor') {
+        router.push('/dashboard');
+      } else {
+        router.push('/dashboard');
+      }
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Login failed');
     }

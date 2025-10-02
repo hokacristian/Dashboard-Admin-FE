@@ -9,6 +9,7 @@ import {
   FileText,
   Settings,
   LogOut,
+  Briefcase,
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
@@ -23,7 +24,13 @@ const menuItems = [
     title: 'Events',
     icon: Calendar,
     href: '/dashboard/events',
-    roles: ['admin', 'supervisor', 'petugas'],
+    roles: ['admin', 'supervisor'],
+  },
+  {
+    title: 'My Events',
+    icon: Briefcase,
+    href: '/dashboard/petugas',
+    roles: ['petugas'],
   },
   {
     title: 'Users',

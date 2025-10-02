@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 import {
   LayoutDashboard,
   Calendar,
@@ -17,14 +19,24 @@ import { DashboardStats, EventSummary, ProgressReport } from '@/types';
 import { format } from 'date-fns';
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const { user, isLoading: authLoading } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [eventsSummary, setEventsSummary] = useState<EventSummary[]>([]);
   const [recentActivities, setRecentActivities] = useState<ProgressReport[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchDashboardData();
-  }, []);
+    // Redirect petugas to their dedicated page
+    if (!authLoading && user && user.role === 'petugas') {
+      router.push('/dashboard/petugas');
+      return;
+    }
+
+    if (!authLoading && user && (user.role === 'admin' || user.role === 'supervisor')) {
+      fetchDashboardData();
+    }
+  }, [user, authLoading, router]);
 
   const fetchDashboardData = async () => {
     try {

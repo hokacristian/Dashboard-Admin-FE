@@ -158,7 +158,7 @@ export default function EditEventPage() {
         {/* Header */}
         <div className="flex items-center gap-4">
           <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 rounded-lg"><ArrowLeft className="w-6 h-6" /></button>
-          <div><h1 className="text-3xl font-bold">Edit Event</h1><p className="text-black-600 mt-1">Update detail untuk event {formData.nama_tender}.</p></div>
+          <div><h1 className="text-3xl font-bold text-gray-900">Edit Event</h1><p className="text-gray-700 mt-1">Update detail untuk event {formData.nama_tender}.</p></div>
         </div>
 
         {/* Main Details Card */}
