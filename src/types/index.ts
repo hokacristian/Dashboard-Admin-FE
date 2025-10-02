@@ -114,7 +114,7 @@ export interface DashboardStats {
   };
 }
 
-export interface EventSummary extends Event {
+export interface EventSummary extends Omit<Event, 'assigned_petugas'> {
   creator: User;
   assigned_petugas: { petugas: Partial<User> }[];
   milestones: Milestone[];

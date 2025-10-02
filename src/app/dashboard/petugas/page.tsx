@@ -15,10 +15,15 @@ interface EventWithMilestones extends Event {
   milestones: Milestone[];
   assigned_petugas: {
     id: string;
+    event_id: string;
+    petugas_id: string;
+    assigned_by: string;
+    assigned_at: string;
     petugas: {
       id: string;
       username: string;
       nama_lengkap: string;
+      foto_profil: string | null;
     };
   }[];
   _count: {

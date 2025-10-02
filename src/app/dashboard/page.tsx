@@ -174,8 +174,8 @@ export default function DashboardPage() {
                       {activity.user?.nama_lengkap}
                     </p>
                     <p className="text-xs text-gray-600 mt-1">
-                      {activity.description.substring(0, 60)}
-                      {activity.description.length > 60 ? '...' : ''}
+                      {(activity.description || activity.deskripsi || '')?.substring(0, 60)}
+                      {(activity.description || activity.deskripsi || '')?.length > 60 ? '...' : ''}
                     </p>
                     <div className="flex items-center gap-2 mt-2">
                       <Clock className="w-3 h-3 text-gray-400" />
