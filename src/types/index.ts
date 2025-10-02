@@ -48,6 +48,7 @@ export interface ProgressReport {
   created_at: string;
   updated_at?: string;
   user?: User;
+  petugas?: User;
   milestone?: Milestone;
   type?: string;
   title?: string;

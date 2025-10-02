@@ -11,6 +11,12 @@ import { Modal } from '@/components/ui/Modal';
 import api from '@/lib/api';
 import { User } from '@/types';
 
+interface Column<T> {
+  header: string;
+  accessor: keyof T | ((row: T) => React.ReactNode);
+  className?: string;
+}
+
 export default function UsersPage() {
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
@@ -62,12 +68,12 @@ export default function UsersPage() {
     }
   };
 
-  const columns = [
-    { header: 'Nama Lengkap', accessor: 'nama_lengkap' },
-    { header: 'Email', accessor: 'email' },
-    { 
-      header: 'Role', 
-      accessor: (user: User) => <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>{user.role}</Badge> 
+  const columns: Column<User>[] = [
+    { header: 'Nama Lengkap', accessor: 'nama_lengkap' as keyof User },
+    { header: 'Email', accessor: 'email' as keyof User },
+    {
+      header: 'Role',
+      accessor: (user: User) => <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>{user.role}</Badge>
     },
     {
       header: 'Aksi',

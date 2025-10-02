@@ -29,7 +29,7 @@ export default function EditEventPage() {
   const [error, setError] = useState<string | null>(null);
 
   // Status states
-  const [newStatus, setNewStatus] = useState('');
+  const [newStatus, setNewStatus] = useState<Event['status']>('planning');
   const [statusLoading, setStatusLoading] = useState(false);
   const [statusError, setStatusError] = useState<string | null>(null);
 
@@ -41,6 +41,11 @@ export default function EditEventPage() {
   const [petugasError, setPetugasError] = useState<string | null>(null);
   const [petugasToRemove, setPetugasToRemove] = useState<PetugasAssignment | null>(null);
   const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
+
+  // Delete Event states
+  const [isDeleteEventModalOpen, setIsDeleteEventModalOpen] = useState(false);
+  const [deleteEventLoading, setDeleteEventLoading] = useState(false);
+  const [deleteEventError, setDeleteEventError] = useState<string | null>(null);
 
   useEffect(() => {
     if (eventId) {
@@ -132,6 +137,19 @@ export default function EditEventPage() {
     } catch (err: any) { setPetugasError(err.response?.data?.message || 'Failed to remove petugas.'); } finally { setPetugasLoading(false); }
   };
 
+  const handleDeleteEvent = async () => {
+    setDeleteEventLoading(true);
+    setDeleteEventError(null);
+    try {
+      await api.delete(`/events/${eventId}`);
+      router.push('/dashboard'); // Redirect to dashboard after deletion
+    } catch (err: any) {
+      setDeleteEventError(err.response?.data?.message || 'Failed to delete event.');
+    } finally {
+      setDeleteEventLoading(false);
+    }
+  };
+
   if (isFetching) return <div className="text-center py-12">Loading...</div>;
 
   return (
@@ -161,7 +179,7 @@ export default function EditEventPage() {
           <div className="p-6">
             <h3 className="text-lg font-medium border-b pb-2">Ubah Status</h3>
             {statusError && <div className="p-4 my-4 text-sm text-red-800 rounded-lg bg-red-50">{statusError}</div>}
-            <div className="mt-4 flex items-center gap-4"><select value={newStatus} onChange={(e) => setNewStatus(e.target.value)} className="flex-grow p-2 border rounded-md bg-white"><option value="pending">Pending</option><option value="on_progress">On Progress</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select><Button onClick={handleStatusChange} disabled={statusLoading}>{statusLoading ? 'Menyimpan...' : 'Simpan Status'}</Button></div>
+            <div className="mt-4 flex items-center gap-4"><select value={newStatus} onChange={(e) => setNewStatus(e.target.value as Event['status'])} className="flex-grow p-2 border rounded-md bg-white"><option value="planning">Planning</option><option value="on_progress">On Progress</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select><Button onClick={handleStatusChange} disabled={statusLoading}>{statusLoading ? 'Menyimpan...' : 'Simpan Status'}</Button></div>
           </div>
         </Card>
 
@@ -174,6 +192,20 @@ export default function EditEventPage() {
             <div className="mt-6"><h4 className="font-medium">Petugas yang Ditugaskan</h4><div className="mt-2 space-y-2">{assignedPetugas.length > 0 ? assignedPetugas.map(assignment => (<div key={assignment.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"><div><p className="font-medium">{assignment.petugas.nama_lengkap}</p><p className="text-sm text-gray-500">{assignment.petugas.email}</p></div><Button size="sm" variant="destructive" onClick={() => openRemoveModal(assignment)}><X className="w-4 h-4" /></Button></div>)) : (<p className="text-gray-500">Belum ada petugas yang ditugaskan.</p>)}</div></div>
           </div>
         </Card>
+
+        {/* Danger Zone Card */}
+        <Card className="border-red-500">
+            <div className="p-6">
+                <h3 className="text-lg font-medium text-red-600">Zona Berbahaya</h3>
+                <div className="mt-4 flex items-center justify-between">
+                    <div>
+                        <p className="font-medium">Hapus Event Ini</p>
+                        <p className="text-sm text-gray-500">Setelah dihapus, event ini tidak dapat dipulihkan.</p>
+                    </div>
+                    <Button variant="destructive" onClick={() => setIsDeleteEventModalOpen(true)}>Hapus Event</Button>
+                </div>
+            </div>
+        </Card>
       </div>
 
       {/* Remove Petugas Modal */}
@@ -183,13 +215,20 @@ export default function EditEventPage() {
             <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
             <p className="mb-4">Apakah Anda yakin ingin menghapus <span className="font-bold">{petugasToRemove.petugas.nama_lengkap}</span> dari event ini?</p>
             {petugasError && <p className="text-red-600 text-sm mb-4">{petugasError}</p>}
-            <div className="flex justify-center gap-4">
-              <Button variant="outline" onClick={closeRemoveModal} disabled={petugasLoading}>Batal</Button>
-              <Button variant="destructive" onClick={handleRemovePetugas} disabled={petugasLoading}>{petugasLoading ? 'Menghapus...' : 'Ya, Hapus'}</Button>
-            </div>
+            <div className="flex justify-center gap-4"><Button variant="outline" onClick={closeRemoveModal} disabled={petugasLoading}>Batal</Button><Button variant="destructive" onClick={handleRemovePetugas} disabled={petugasLoading}>{petugasLoading ? 'Menghapus...' : 'Ya, Hapus'}</Button></div>
           </div>
         </Modal>
       )}
+
+      {/* Delete Event Modal */}
+      <Modal isOpen={isDeleteEventModalOpen} onClose={() => setIsDeleteEventModalOpen(false)} title="Konfirmasi Hapus Event">
+        <div className="text-center">
+          <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <p className="mb-4">Apakah Anda benar-benar yakin ingin menghapus event <span className="font-bold">{formData.nama_tender}</span>? Tindakan ini tidak dapat dibatalkan.</p>
+          {deleteEventError && <p className="text-red-600 text-sm mb-4">{deleteEventError}</p>}
+          <div className="flex justify-center gap-4"><Button variant="outline" onClick={() => setIsDeleteEventModalOpen(false)} disabled={deleteEventLoading}>Batal</Button><Button variant="destructive" onClick={handleDeleteEvent} disabled={deleteEventLoading}>{deleteEventLoading ? 'Menghapus...' : 'Ya, Hapus Event'}</Button></div>
+        </div>
+      </Modal>
     </>
   );
 }

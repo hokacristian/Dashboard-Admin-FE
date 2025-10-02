@@ -257,7 +257,7 @@ export default function EventDetailPage() {
                         <p className="font-medium text-gray-900">
                           {progress.petugas?.nama_lengkap}
                         </p>
-                        <p className="text-sm text-gray-600 mt-1">{progress.deskripsi}</p>
+                        <p className="text-sm text-gray-600 mt-1">{progress.description}</p>
                       </div>
                     </div>
                     <p className="text-xs text-gray-500 mt-2">

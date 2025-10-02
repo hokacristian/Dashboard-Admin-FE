@@ -14,7 +14,7 @@ export default function EditUserPage() {
   const params = useParams();
   const userId = params.id as string;
 
-  const [formData, setFormData] = useState<Partial<User>>({});
+  const [formData, setFormData] = useState<Partial<User & { password?: string }>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState<string | null>(null);
