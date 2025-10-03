@@ -12,9 +12,11 @@ import { Modal } from '@/components/ui/Modal';
 import api from '@/lib/api';
 import { Event, PaginatedResponse } from '@/types';
 import { format } from 'date-fns';
+import { useToast } from '@/context/ToastContext';
 
 export default function EventsPage() {
   const router = useRouter();
+  const { success, error: showError, showLoading, hideLoading } = useToast();
   const [events, setEvents] = useState<Event[]>([]);
   const [pagination, setPagination] = useState({
     page: 1,
@@ -63,14 +65,18 @@ export default function EventsPage() {
   const handleDelete = async () => {
     if (!selectedEvent) return;
 
+    showLoading('Deleting event...');
     try {
       await api.delete(`/events/${selectedEvent.id}`);
       setShowDeleteModal(false);
       setSelectedEvent(null);
       fetchEvents();
+      success('Event deleted successfully!');
     } catch (error) {
       console.error('Failed to delete event:', error);
-      alert('Failed to delete event');
+      showError('Failed to delete event');
+    } finally {
+      hideLoading();
     }
   };
 

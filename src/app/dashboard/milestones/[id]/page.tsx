@@ -21,6 +21,7 @@ import api from '@/lib/api';
 import { Milestone, ProgressReport } from '@/types';
 import { format } from 'date-fns';
 import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/context/ToastContext';
 
 interface MilestoneDetail extends Milestone {
   event: {
@@ -36,6 +37,7 @@ export default function MilestoneDetailPage() {
   const params = useParams();
   const milestoneId = params.id as string;
   const { user } = useAuth();
+  const { success, error: showError, showLoading, hideLoading } = useToast();
 
   const [milestone, setMilestone] = useState<MilestoneDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -122,6 +124,7 @@ export default function MilestoneDetailPage() {
 
     setProgressLoading(true);
     setProgressError(null);
+    showLoading('Updating progress...');
 
     try {
       const formData = new FormData();
@@ -145,23 +148,30 @@ export default function MilestoneDetailPage() {
 
       setIsEditProgressModalOpen(false);
       fetchMilestoneDetail();
-      alert('Progress berhasil diupdate!');
+      success('Progress berhasil diupdate!');
     } catch (err: any) {
       setProgressError(err.response?.data?.message || 'Failed to update progress.');
+      showError(err.response?.data?.message || 'Failed to update progress.');
     } finally {
       setProgressLoading(false);
+      hideLoading();
     }
   };
 
   const handleDeleteProgress = async (progressId: string) => {
-    if (!confirm('Apakah Anda yakin ingin menghapus progress report ini?')) return;
+    // Manual confirmation using Modal would be better, but for now we'll use a simple check
+    const confirmed = window.confirm('Apakah Anda yakin ingin menghapus progress report ini?');
+    if (!confirmed) return;
 
+    showLoading('Deleting progress...');
     try {
       await api.delete(`/progress-reports/${progressId}`);
       fetchMilestoneDetail();
-      alert('Progress berhasil dihapus!');
+      success('Progress berhasil dihapus!');
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to delete progress.');
+      showError(err.response?.data?.message || 'Failed to delete progress.');
+    } finally {
+      hideLoading();
     }
   };
 

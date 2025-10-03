@@ -7,9 +7,11 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input, TextArea, Select } from '@/components/ui/Input';
 import api from '@/lib/api';
+import { useToast } from '@/context/ToastContext';
 
 export default function CreateEventPage() {
   const router = useRouter();
+  const { success, error: showError, showLoading, hideLoading } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     nama_tender: '',
@@ -26,6 +28,7 @@ export default function CreateEventPage() {
     e.preventDefault();
     setErrors({});
     setIsLoading(true);
+    showLoading('Creating event...');
 
     try {
       const payload = {
@@ -34,15 +37,18 @@ export default function CreateEventPage() {
       };
 
       await api.post('/events', payload);
+      success('Event created successfully!');
       router.push('/dashboard/events');
     } catch (error: any) {
       if (error.response?.data?.errors) {
         setErrors(error.response.data.errors);
+        showError('Please check the form for errors');
       } else {
-        alert('Failed to create event');
+        showError('Failed to create event');
       }
     } finally {
       setIsLoading(false);
+      hideLoading();
     }
   };
 

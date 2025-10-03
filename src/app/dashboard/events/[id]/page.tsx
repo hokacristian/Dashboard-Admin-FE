@@ -22,11 +22,13 @@ import { Modal } from '@/components/ui/Modal';
 import api from '@/lib/api';
 import { Event, Milestone, User, ProgressReport } from '@/types';
 import { format } from 'date-fns';
+import { useToast } from '@/context/ToastContext';
 
 export default function EventDetailPage() {
   const router = useRouter();
   const params = useParams();
   const eventId = params.id as string;
+  const { success, error: showError, showLoading, hideLoading } = useToast();
 
   const [event, setEvent] = useState<Event | null>(null);
   const [milestones, setMilestones] = useState<Milestone[]>([]);
@@ -156,13 +158,18 @@ export default function EventDetailPage() {
   };
 
   const handleDeleteMilestone = async (milestoneId: string) => {
-    if (!confirm('Are you sure you want to delete this milestone?')) return;
+    const confirmed = window.confirm('Are you sure you want to delete this milestone?');
+    if (!confirmed) return;
 
+    showLoading('Deleting milestone...');
     try {
       await api.delete(`/milestones/${milestoneId}`);
       fetchEventDetails();
+      success('Milestone deleted successfully!');
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to delete milestone.');
+      showError(err.response?.data?.message || 'Failed to delete milestone.');
+    } finally {
+      hideLoading();
     }
   };
 

@@ -10,6 +10,7 @@ import { Modal } from '@/components/ui/Modal';
 import api from '@/lib/api';
 import { Event, Milestone } from '@/types';
 import { format } from 'date-fns';
+import { useToast } from '@/context/ToastContext';
 
 interface EventWithMilestones extends Event {
   milestones: Milestone[];
@@ -34,6 +35,7 @@ interface EventWithMilestones extends Event {
 
 export default function PetugasPage() {
   const router = useRouter();
+  const { success, error: showError, showLoading, hideLoading } = useToast();
   const [events, setEvents] = useState<EventWithMilestones[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState<EventWithMilestones | null>(null);
@@ -106,6 +108,7 @@ export default function PetugasPage() {
 
     setUploadLoading(true);
     setUploadError(null);
+    showLoading('Uploading progress...');
 
     try {
       const formData = new FormData();
@@ -127,11 +130,13 @@ export default function PetugasPage() {
 
       setIsUploadModalOpen(false);
       fetchMyEvents();
-      alert('Progress berhasil diupload!');
+      success('Progress berhasil diupload!');
     } catch (err: any) {
       setUploadError(err.response?.data?.message || 'Failed to upload progress.');
+      showError(err.response?.data?.message || 'Failed to upload progress.');
     } finally {
       setUploadLoading(false);
+      hideLoading();
     }
   };
 
