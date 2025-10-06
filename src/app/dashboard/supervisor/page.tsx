@@ -110,7 +110,7 @@ export default function SupervisorPage() {
                   <div className="p-3 bg-blue-50 rounded-lg">
                     <p className="text-sm text-gray-600">Budget</p>
                     <p className="text-lg font-bold text-blue-600 mt-1">
-                      Rp {event.budget?.toLocaleString('id-ID') || 0}
+                      Rp {(event.budget || 0).toLocaleString('id-ID')}
                     </p>
                   </div>
                   <div className="p-3 bg-purple-50 rounded-lg">
