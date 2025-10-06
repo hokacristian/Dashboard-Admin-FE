@@ -33,7 +33,13 @@ export default function DashboardPage() {
       return;
     }
 
-    if (!authLoading && user && (user.role === 'admin' || user.role === 'supervisor')) {
+    // Redirect supervisor to their dedicated page
+    if (!authLoading && user && user.role === 'supervisor') {
+      router.push('/dashboard/supervisor');
+      return;
+    }
+
+    if (!authLoading && user && user.role === 'admin') {
       fetchDashboardData();
     }
   }, [user, authLoading, router]);

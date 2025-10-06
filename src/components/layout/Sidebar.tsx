@@ -18,13 +18,19 @@ const menuItems = [
     title: 'Dashboard',
     icon: LayoutDashboard,
     href: '/dashboard',
-    roles: ['admin', 'supervisor'],
+    roles: ['admin'],
   },
   {
     title: 'Events',
     icon: Calendar,
     href: '/dashboard/events',
-    roles: ['admin', 'supervisor'],
+    roles: ['admin'],
+  },
+  {
+    title: 'Event Monitoring',
+    icon: Briefcase,
+    href: '/dashboard/supervisor',
+    roles: ['supervisor'],
   },
   {
     title: 'My Events',

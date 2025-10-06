@@ -26,6 +26,8 @@ export default function DashboardLayout({
       const currentPath = window.location.pathname;
       if (currentPath === '/dashboard' && user.role === 'petugas') {
         router.push('/dashboard/petugas');
+      } else if (currentPath === '/dashboard' && user.role === 'supervisor') {
+        router.push('/dashboard/supervisor');
       }
     }
   }, [user, isLoading, router]);
