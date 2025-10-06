@@ -38,6 +38,10 @@ export default function SupervisorPage() {
   const [events, setEvents] = useState<EventWithMilestones[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const formatCurrency = (value: number) => {
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  };
+
   useEffect(() => {
     fetchAllEvents();
   }, []);
@@ -110,7 +114,7 @@ export default function SupervisorPage() {
                   <div className="p-3 bg-blue-50 rounded-lg">
                     <p className="text-sm text-gray-600">Budget</p>
                     <p className="text-lg font-bold text-blue-600 mt-1">
-                      Rp {(event.budget || 0).toLocaleString('id-ID')}
+                      Rp {formatCurrency(event.budget || 0)}
                     </p>
                   </div>
                   <div className="p-3 bg-purple-50 rounded-lg">

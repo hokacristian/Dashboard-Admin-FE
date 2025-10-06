@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Read(//mnt/d/KERJAAN/Dashboard-Monitor-FE/**)"
+      "Read(//mnt/d/KERJAAN/Dashboard-Monitor-FE/**)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []
